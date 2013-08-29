@@ -30,8 +30,6 @@ There are three components to the project:
 
 ### Analyzing the adiposity rebound for children
 
-To install python dependencies, clone the project and run `pip install -r requirements.txt`
-
 ## The data: growth measurements of children
 
 NorthShore provided us with the height and weight measurements of over 23,000 children de-identified records captured over the past 6 years by NorthShore hospitals’ EMR system. A sample of the data we received is shown below. We have the patients’ gender, race, and ethnicities, along with their height, weight, and BMI measurements at different ages, from the ages of 0 to 19 yrs.
@@ -53,6 +51,7 @@ git clone https://github.com/dssg/dssg-northshore-bmi
 cd dssg-northshore-bmi/
 ````
 
+Then you will need to install the python dependencies by running `pip install -r requirements.txt`
 
 ## Contributing to the project
 
