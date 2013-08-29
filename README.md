@@ -1,4 +1,4 @@
-# NorthShore Obesity Prediction Project
+# Childhood Obesity Prediction Project
 This is a [Data Science for Social Good](http://www.dssg.io) project to analyze children's growth curves to determine which kids are at risk of obesity.
 
 ## The problem: increasing prevalence of obesity
@@ -32,7 +32,7 @@ There are three components to the project:
 
 To install python dependencies, clone the project and run `pip install -r requirements.txt`
 
-## The data: de-identified growth measurements of children
+## The data: growth measurements of children
 
 NorthShore provided us with the height and weight measurements of over 23,000 children de-identified records captured over the past 6 years by NorthShore hospitals’ EMR system. A sample of the data we received is shown below. We have the patients’ gender, race, and ethnicities, along with their height, weight, and BMI measurements at different ages, from the ages of 0 to 19 yrs.
 
