@@ -1,10 +1,9 @@
 ##### SETUP ######
 
-import sys
-sys.path.append('../config')
-sys.path.append('../visualize')
+#import sys
+#sys.path.append('../visualize')
+#import vis_quartiles_individual
 
-import config
 import pickle
 import numpy as np
 import pandas as pd
@@ -14,13 +13,11 @@ import statsmodels.api as sm
 from scipy import interpolate
 import math
 
-#import vis_quartiles_individual
-
 ##### VARIABLES ######
 
 attributes = ["ht","wt","bmi"]
-percentiles = config.percentiles
-intervals = config.intervals
+percentiles = np.array([3, 5, 10, 25, 50, 75, 85, 90, 95, 97])
+intervals = np.trunc(np.concatenate((np.array([0.01]),np.arange(.05,.2,.05),np.arange(.4,2,.2), np.arange(2,20,.5)))*100)/100
 
 ## Plot figures?
 plot_bool = False

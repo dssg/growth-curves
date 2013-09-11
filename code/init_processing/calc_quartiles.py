@@ -1,9 +1,5 @@
 ##### SETUP ######
 
-import sys
-sys.path.append('../config')
-
-import config
 import aggregate
 
 import pickle
@@ -14,7 +10,7 @@ import pandas as pd
 
 ##### VARIABLES #####
 
-percentiles = config.percentiles
+percentiles = np.array([3, 5, 10, 25, 50, 75, 85, 90, 95, 97])
 
 #####################
 

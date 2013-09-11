@@ -1,8 +1,5 @@
 ##### SETUP ######
-import sys
-sys.path.append('../config')
 
-import config
 import pickle
 import numpy as np
 import pandas as pd
@@ -14,8 +11,9 @@ import numpy as np
 import statsmodels.api as sm
 from scipy import stats 
     
-## Age points to resample data from
-intervals = config.intervals
+## Set up age intervals
+## Float instability created errors, so corrected the following trunction 
+intervals = np.trunc(np.concatenate((np.array([0.01]),np.arange(.05,.2,.05),np.arange(.4,2,.2), np.arange(2,20,.5)))*100)/100
 
 ##################
 

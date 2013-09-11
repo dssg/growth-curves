@@ -2,10 +2,6 @@
 
 ##### SETUP ######
 
-import sys
-sys.path.append('../config')
-
-import config
 import pickle
 import numpy as np
 import pandas as pd
@@ -40,6 +36,18 @@ font_size = 14
 
 #################
 
+## Color generator with maximum spacing between colors
+## from: http://stackoverflow.com/questions/10254207/color-and-line-writing-using-matplotlib
+import colorsys
+
+def get_color(color):
+    for hue in range(color):
+        hue = 1. * hue / color
+        col = [int(x) for x in colorsys.hsv_to_rgb(hue, 1.0, 230)]
+        yield "#{0:02x}{1:02x}{2:02x}".format(*col)
+
+#################
+        
 ## Open pickle file, saved from bmi_aggregate.py
 df_aggregate = pickle.load(open('../../data/pkl/BMI_aggregate_percentiles.pkl', 'rb'))
 
@@ -106,7 +114,7 @@ for name, group in grouped:
     #name_race_ethnicity = name[1]
 
     for x_attribute, y_attribute in attribute_pairs:
-        color = config.get_color(len(percentiles))
+        color = get_color(len(percentiles))
         
         for percentile in percentiles:
             x_name = x_attribute
@@ -135,7 +143,7 @@ for name, group in grouped:
     #name_race_ethnicity = name[1]
 
     for x_attribute, y_attribute in attribute_pairs:
-        color = config.get_color(len(percentiles))
+        color = get_color(len(percentiles))
         for percentile in percentiles_expansion:
             x_name = x_attribute
             y_name = y_attribute + "_" + str(percentile)
