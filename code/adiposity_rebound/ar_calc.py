@@ -14,84 +14,82 @@ import statsmodels.api as sm
 from scipy import interpolate
 import math
 
-import vis_quartiles_individual
-
-header = config.header
-attributes = config.attributes
-percentiles = config.percentiles
-intervals = config.intervals.tolist()
-
-## Add additional headers into header dictoinary
-header["count"] = "Number of Datapoints"
-header["ar_find"] = "Method of Finding AR Point"
-header["age_ar"] = "Age at AR"
-header["age_end"] = "Age at End"
-
-## header_list used later in creating new rows
-header_list = [header["id"], header["gender"], header["race_ethnicity"], \
-               header["count"], header["ar_find"], header["age_ar"], header["age_end"]]
-
-for attribute in attributes.keys():
-    header["perc_"+attribute+"_ar"] = "Percentile "+attributes[attribute]+" at AR"
-    header["perc_"+attribute+"_end"] = "Percentile "+attributes[attribute]+" at End"
-    header_list = header_list + [header["perc_"+attribute+"_ar"], header["perc_"+attribute+"_end"]]
-
-##################
+#import vis_quartiles_individual
 
 ##### VARIABLES ######
-    
-plot_bool = True
-input_patient_bool = True
-patient_id = 12322
+
+attributes = ["ht","wt","bmi"]
+percentiles = config.percentiles
+intervals = config.intervals
+
+## Plot figures?
+plot_bool = False
+
+## Plot for blog style if plot_bool is true?
+plot_for_blog = False
+
+## Input individual patients? (Otherwise pulls all patients from BMI_filtered_contain_age5.pkl)
+input_patient_bool = False
+
+## Individual patient to analyze if input_patient_bool is true
+patient_id = 10258 #16785, 10258, 9026, 12322
+
+## Limit number of patients plot
 count_bool = False
+
+## Plot log on y axis?
 plot_log = False
-font_size = 13
+font_size = 14
+
 
 ######################
 
 ##### FUNCTIONS ######
 
-def find_percentile(id_patient, age, df):
-    grouped_age = df.groupby([header["age"]])
-    grouped_patient_age = df.groupby([header["id"], header["age"]])
-                                     
+def find_percentile(id_patient, age, grouped_age, grouped_patient_age):                                     
     df_datapoint = grouped_patient_age.get_group((id_patient, age))
-    ht = df_datapoint[header["ht"]]
-    wt = df_datapoint[header["wt"]]
-    bmi = df_datapoint[header["bmi"]]
+    ht = df_datapoint["ht"]
+    wt = df_datapoint["wt"]
+    bmi = df_datapoint["bmi"]
+    gender = df_datapoint["gender"]
                                      
     group_age = grouped_age.get_group(age)
+    group_age = group_age[group_age["gender"] == gender.iloc[0]]
+    
     num_patients = group_age.shape[0]
-    percent_ht = np.sum(group_age[header["ht"]] < ht.iloc[0])*100.0/num_patients
-    percent_wt = np.sum(group_age[header["wt"]] < wt.iloc[0])*100.0/num_patients
-    percent_bmi = np.sum(group_age[header["bmi"]] < bmi.iloc[0])*100.0/num_patients
-    return (percent_ht, percent_wt, percent_bmi)
+    percent_ht = np.sum(group_age["ht"] < ht.iloc[0])*100.0/num_patients
+    percent_wt = np.sum(group_age["wt"] < wt.iloc[0])*100.0/num_patients
+    percent_bmi = np.sum(group_age["bmi"] < bmi.iloc[0])*100.0/num_patients
+    return (percent_ht, percent_wt, percent_bmi, ht.iloc[0], wt.iloc[0], bmi.iloc[0])
 
 ######################
 
 ## Open pickle file, saved from bmi_adiposity_rebound_filter.py
 ## df_range contains individuals that have data in the age range where AR occurs
-pkl_file = open('../../data/pkl/bmi_data_ar.pkl', 'rb')
-df_range = pickle.load(pkl_file)
+df = pickle.load(open('../../data/pkl/BMI_filtered_contain_age5.pkl', 'rb'))
 
 ## Open pickle file, saved from bmi_initial_processing.py
-pkl_file = open('../../data/pkl/bmi_data.pkl', 'rb')
+df_resampled = pickle.load(open('../../data/pkl/BMI_resampled.pkl', 'rb'))
 
-df_resampled = pickle.load(pkl_file)
-df_filtered = pickle.load(pkl_file)
-df_filtered_out = pickle.load(pkl_file)
-df_outliers = pickle.load(pkl_file)
+## Already ran calculation ##
+## Keep only method 4 results ##
+#pat_list = pd.read_csv("../../data/csv/BMI_ar_4_method4.csv", names = ["Patient ID"])
+#df = df[df["Patient ID"].isin(pat_list["Patient ID"])]
 
 ## Group datapoints for each patient
-df = df_range
-grouped = df.groupby([header["id"]])
+grouped = df.groupby(["id"])
 
-## Create new DataFrame to add AR information for each patient
-df_ar_info = pd.DataFrame(columns = header_list)
+resampled_grouped_age = df_resampled.groupby(["age"])
+resampled_grouped_patient_age = df_resampled.groupby(["id", "age"])
 
+## Create new list to add AR information for each patient
+df_ar_list = []
+                           
 ## Iterate through each patient
 count = 0
 for name_patient, group_patient in grouped:
+
+    #print name_patient
     if count_bool:
         count = count + 1
         if count < 0:
@@ -104,20 +102,35 @@ for name_patient, group_patient in grouped:
     #print name_patient
     #print group_patient
 
-    if plot_bool:
+    # Throw out data less than 2 yeras
+    group_patient = group_patient[group_patient["age"] >= 2.0]
+    
+    if plot_bool and not plot_for_blog:
         ## Create figure to hold patient-specific plots 
         fig = plt.figure()
         ax_age_ht = fig.add_subplot(221)
         ax_age_wt = fig.add_subplot(222)
         ax_age_bmi = fig.add_subplot(223)
         ax_velo = fig.add_subplot(224) ## First derivative of log(ht), log(wt), and log(bmi)
-
+    elif plot_for_blog:
+        fig = plt.figure(1, figsize=(15, 4.75))
+        fig.subplots_adjust(bottom=0.15, left=0.025, right=0.975)
+        ax_age_ht = fig.add_subplot(131)
+        ax_age_wt = fig.add_subplot(132) 
+        ax_age_bmi = fig.add_subplot(133)
+        fig2 = plt.figure()
+        ax_velo = fig2.add_subplot(111)
+        
     ## Count number of datapoints for this patient
     num_x = group_patient.shape[0]
-
+    
+    # And at least 5 datapoints?
+    if num_x < 5:
+        continue
+    
     ## Regression of log(ht) on age
-    x = group_patient[header["age"]]
-    log_ht = np.log(group_patient[header["ht"]])
+    x = group_patient["age"]
+    log_ht = np.log(group_patient["ht"])
     y = log_ht
 
     ## Model with cubic equation
@@ -144,12 +157,12 @@ for name_patient, group_patient in grouped:
             ax_age_ht.plot(xnew,ynew_ht_log, 'r-')
         else:
             ## Plot original data points and fit on lin-lin plot
-            ax_age_ht.plot(x,group_patient[header["ht"]], 'ro')
+            ax_age_ht.plot(x,group_patient["ht"], 'ro')
             ax_age_ht.plot(xnew,ynew_ht, 'r-')
 
     ## Regression of log(wt) on age
-    x = group_patient[header["age"]]
-    log_wt = np.log(group_patient[header["wt"]])
+    x = group_patient["age"]
+    log_wt = np.log(group_patient["wt"])
     y = log_wt
 
     ## Model with cubic equation
@@ -177,7 +190,7 @@ for name_patient, group_patient in grouped:
             ax_age_wt.plot(xnew,ynew_wt_log, 'b-')
         else:
             ## Plot original data points and fit on log-linear plot
-            ax_age_wt.plot(x,group_patient[header["wt"]], 'bo')
+            ax_age_wt.plot(x,group_patient["wt"], 'bo')
             ax_age_wt.plot(xnew,ynew_wt, 'b-')
 
     ## Calculate first derivative of log(bmi) from first derivatives of log(wt) and log(ht)
@@ -189,7 +202,7 @@ for name_patient, group_patient in grouped:
         ax_velo.axhline(y=0)
 
         ## Plot original BMI datapoints
-        ax_age_bmi.plot(group_patient[header["age"]],group_patient[header["bmi"]], 'go')
+        ax_age_bmi.plot(group_patient["age"],group_patient["bmi"], 'go')
 
         ynew_bmi = np.divide(ynew_wt, np.power(ynew_ht, 2)) * 703
         ax_age_bmi.plot(xnew, ynew_bmi, 'g-')
@@ -211,7 +224,10 @@ for name_patient, group_patient in grouped:
         ax_velo.legend(loc = "lower right", prop={'size':font_size})
 
         ## Set title
-        fig.suptitle("Patient #" + str(int(name_patient)) + " Progressing through Adiposity Rebound", fontsize = font_size)
+        if not plot_for_blog:
+            fig.suptitle("Patient #" + str(int(name_patient)) + " Progressing through Adiposity Rebound", fontsize = font_size)
+        else:
+            fig.suptitle("Individual Patient with Late Adiposity Rebound", fontsize = font_size)
 
         font = {'family' : 'normal', 'weight' : 'normal', 'size'   : font_size}
         plt.rc('font', **font)
@@ -285,29 +301,36 @@ for name_patient, group_patient in grouped:
             ar_age = f(0)
             if plot_bool:
                 ax_velo.axvline(x=ar_age)
+                if plot_for_blog:
+                    ax_age_bmi.axvline(x=ar_age, color = "red", ls = "--")
+
         ## If cannot interpolate, means that either no ages or two ages were found. Thus, cannot determine AR.
         except ValueError as inst:
             print "ERROR: " + str(name_patient) + " - " + inst.args[0]
         
     if plot_bool:
         ## Plot when patient's indvidual curve over population growth curves
-        vis_quartiles_individual.plot_individual_against_percentiles(name_patient)
+        #vis_quartiles_individual.plot_individual_against_percentiles(name_patient)
 
+        
         ## Display plot
         plt.show() #bbox_inches='tight', transparent="True", pad_inches=0
 
     ## Now calculate percentile patient is end at the end of his/her growth curve
             
     ## Use resampled dataset, and group by patients
-    grouped_resampled_patient = df_resampled.groupby([header["id"]])
-    grouped_resampled_patient_age = df_resampled.groupby([header["id"], header["age"]])
+    grouped_resampled_patient = df_resampled.groupby(["id"])
+    grouped_resampled_patient_age = df_resampled.groupby(["id", "age"])
 
     ## Select the last age datapoint, and record age, height, weight, and BMI
-    last_resampled_dpt = grouped_resampled_patient.get_group(name_patient).sort(header["age"]).iloc[-1]
-    last_age = last_resampled_dpt[header["age"]]
-    last_ht = last_resampled_dpt[header["ht"]]
-    last_wt = last_resampled_dpt[header["wt"]]
-    last_bmi = last_resampled_dpt[header["bmi"]]
+    last_resampled_dpt = grouped_resampled_patient.get_group(name_patient).sort("age").iloc[-1]
+    last_age = last_resampled_dpt["age"]
+    last_ht = last_resampled_dpt["ht"]
+    last_wt = last_resampled_dpt["wt"]
+    last_bmi = last_resampled_dpt["bmi"]
+
+    first_resampled_dpt = grouped_resampled_patient.get_group(name_patient).sort("age").iloc[0]
+    first_age = first_resampled_dpt["age"]
 
     ## Calculate weight, height, BMI percentiles at AR, if AR was found
 
@@ -315,67 +338,91 @@ for name_patient, group_patient in grouped:
         ar_ht_perc = np.nan
         ar_wt_perc = np.nan
         ar_bmi_perc = np.nan
+
+        ar_ht_res = np.nan
+        ar_wt_res = np.nan
+        ar_bmi_res = np.nan
         
     else:
         interval_index_right = np.searchsorted(config.intervals, ar_age)
         
         if ar_age in config.intervals:
-            (ar_ht_perc, ar_wt_perc, ar_bmi_perc) = config.find_percentile(name_patient, ar_age, df_resampled)
+            (ar_ht_perc, ar_wt_perc, ar_bmi_perc, ar_ht_res, ar_wt_res, ar_bmi_res) = find_percentile(name_patient, ar_age, resampled_grouped_age, resampled_grouped_patient_age)
         else:
             interval_index_left = interval_index_right - 1
             age_left = intervals[interval_index_left]
             age_right = intervals[interval_index_right]
 
-            if age_left < group_patient[header["age"]].min():
-                (ar_ht_perc, ar_wt_perc, ar_bmi_perc) = find_percentile(name_patient, age_right, df_resampled)
+            if age_left < group_patient["age"].min():
+                (ar_ht_perc, ar_wt_perc, ar_bmi_perc, ar_ht_res, ar_wt_res, ar_bmi_res) = find_percentile(name_patient, age_right, resampled_grouped_age, resampled_grouped_patient_age)
                 
-            elif age_right > group_patient[header["age"]].max():
-                (ar_ht_perc, ar_wt_perc, ar_bmi_perc) = find_percentile(name_patient, age_left, df_resampled)
+            elif age_right > group_patient["age"].max():
+                (ar_ht_perc, ar_wt_perc, ar_bmi_perc, ar_ht_res, ar_wt_res, ar_bmi_res) = find_percentile(name_patient, age_left, resampled_grouped_age, resampled_grouped_patient_age)
                 
             else:
-                (ht_left_perc, wt_left_perc, bmi_left_perc) = find_percentile(name_patient, age_left, df_resampled)
-                (ht_right_perc, wt_right_perc, bmi_right_perc) = find_percentile(name_patient, age_right, df_resampled)
+                (ht_left_perc, wt_left_perc, bmi_left_perc, ar_ht_left_res, ar_wt_left_res, ar_bmi_left_res) = \
+                               find_percentile(name_patient, age_left, resampled_grouped_age, resampled_grouped_patient_age)
+                (ht_right_perc, wt_right_perc, bmi_right_perc, ar_ht_right_res, ar_wt_right_res, ar_bmi_right_res) = \
+                                find_percentile(name_patient, age_right, resampled_grouped_age, resampled_grouped_patient_age)
                     
                 right_ratio = (ar_age - age_left)/(age_right - age_left)
                 left_ratio = 1 - right_ratio
                 ar_ht_perc = ht_left_perc * left_ratio + ht_right_perc * right_ratio
                 ar_wt_perc = wt_left_perc * left_ratio + wt_right_perc * right_ratio
                 ar_bmi_perc = bmi_left_perc * left_ratio + bmi_right_perc * right_ratio
+                
+                ar_ht_res = ar_ht_left_res * left_ratio + ar_ht_right_res * right_ratio
+                ar_wt_res = ar_wt_left_res * left_ratio + ar_wt_right_res * right_ratio
+                ar_bmi_res = ar_bmi_left_res * left_ratio + ar_bmi_right_res * right_ratio
 
     ## Create new numpy list that is of the correct dimensions
-    row = np.array([None]*len(header_list))
-    row = np.reshape(row, (1, len(header_list)))
+    #row = np.array([None]*len(header_list))
+    #row = np.reshape(row, (1, len(header_list)))
 
     ## Create new DataFrame row
-    df_row = pd.DataFrame(row, columns = header_list)
+    #df_row = pd.DataFrame(row, columns = header_list)
+    df_row = dict()
 
     ## Save patient information to this new row
-    df_row[header["id"]] = name_patient
-    df_row[header["gender"]] = group_patient[header["gender"]].iloc[0]
-    df_row[header["race_ethnicity"]] = group_patient[header["race_ethnicity"]].iloc[0]
-    df_row[header["count"]] = num_x
-    df_row[header["ar_find"]] = ar_find
-    df_row[header["age_ar"]] = ar_age
-    df_row[header["age_end"]] = last_age
+    df_row["id"] = name_patient
+    df_row["gender"] = group_patient["gender"].iloc[0]
+    df_row["race_ethnicity"] = group_patient["race_ethnicity"].iloc[0]
+    df_row["count"] = num_x
+    df_row["ar_find"] = ar_find
+    df_row["age_ar"] = ar_age
+    df_row["age_front"] = first_age
+    df_row["age_end"] = last_age
 
     ## Find and save height, weight, BMI percentiles at the last resampled datapoint
-    (df_row[header["perc_ht_end"]], df_row[header["perc_wt_end"]], df_row[header["perc_bmi_end"]]) = \
-                            find_percentile(name_patient, last_age, df_resampled)
+    (df_row["perc_ht_end"], df_row["perc_wt_end"], df_row["perc_bmi_end"], \
+     df_row["res_ht_end"], df_row["res_wt_end"], df_row["res_bmi_end"]) = \
+                            find_percentile(name_patient, last_age, resampled_grouped_age, resampled_grouped_patient_age)
+
+    ## Find and save height, weight, BMI percentiles at the first resampled datapoint
+    (df_row["perc_ht_front"], df_row["perc_wt_front"], df_row["perc_bmi_front"], \
+     df_row["res_ht_front"], df_row["res_wt_front"], df_row["res_bmi_front"]) = \
+                            find_percentile(name_patient, first_age, resampled_grouped_age, resampled_grouped_patient_age)
 
     ## Seight, weight, BMI percentiles at AR
-    (df_row[header["perc_ht_ar"]], df_row[header["perc_wt_ar"]], df_row[header["perc_bmi_ar"]]) = \
+    (df_row["perc_ht_ar"], df_row["perc_wt_ar"], df_row["perc_bmi_ar"]) = \
                             (ar_ht_perc, ar_wt_perc, ar_bmi_perc)
+    (df_row["res_ht_ar"], df_row["res_wt_ar"], df_row["res_bmi_ar"]) = \
+                            (ar_ht_res, ar_wt_res, ar_bmi_res)
 
     ## Append new row to aggregate AR info dataframe
-    df_ar_info = pd.DataFrame.append(df_ar_info, df_row)
+    df_ar_list.append(df_row)
+    #df_ar_info = pd.DataFrame.append(df_ar_info, df_row)
 
     if input_patient_bool:
         break
-
+df_ar_info = pd.DataFrame(df_ar_list)
+    
 if not input_patient_bool:
     ## Dump data
-    output = open('../../data/pkl/BMI_ar_calculate_5pt.pkl', 'wb')
+    #output = open('../../data/pkl/BMI_ar_4_onlymethod4_calculate_5pt.pkl', 'wb')
+    output = open('../../data/pkl/BMI_filtered_contain_age5_ar_calculate.pkl', 'wb')
     pickle.dump(df_ar_info, output, -1)
     output.close()
 
-    df_ar_info.to_csv("../../data/csv/BMI_ar_calculate_5pt.csv")
+    #df_ar_info.to_csv("../../data/csv/BMI_ar_4_onlymethod4_calculate_5pt.csv")
+    df_ar_info.to_csv("../../data/csv/BMI_filtered_contain_age5_ar_calculate.csv")

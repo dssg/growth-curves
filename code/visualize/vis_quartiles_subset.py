@@ -17,23 +17,23 @@ import matplotlib
 
 ### VARIABLES ###
 
-## Age intervals
-intervals = config.intervals
+## Set up age intervals
+## Float instability created errors, so corrected the following trunction 
+intervals = np.trunc(np.concatenate((np.array([0.01]),np.arange(.05,.2,.05),np.arange(.4,2,.2), np.arange(2,20,.5)))*100)/100
 
 ## Percentiles to display
-#percentiles = config.percentiles
 percentiles = np.array([10, 50, 75, 85, 90, 95, 97])
-#percentiles = np.array([10, 50, 75, 90, 95, 97])
+percentiles_expansion = np.array([5, 25, 50, 75, 95])
 
 ## Age range to display on plot
-x_age_min = 2
-x_age_max = 18.5
+x_age_min = 3
+x_age_max = 11
 
 ## Set to True to plot age vs. bmi, False to plot age vs. ht and age vs. wt
 plot_bmi_only = True
 
-## Display CDC data on plots
-display_cdc = True
+## Display subset data on plots
+display_subset = True
 
 ## Plot text size
 font_size = 14
@@ -60,19 +60,18 @@ df_aggregate = df_aggregate[df_aggregate["age"] <= x_age_max]
 ## Only use data aggregated across all races
 df_aggregate = df_aggregate[df_aggregate["race_ethnicity"] == 'All']
 
-#### CDC DATA ADD ####
-df_cdc = pd.read_csv("../../data/csv/CDC_data.csv")
+#### EXPANSION ADD ####
+df_exp = pickle.load(open('../../data/pkl/BMI_subset_aggregate.pkl', 'rb'))
 
-df_cdc = df_cdc[df_cdc["age"] >= x_age_min]
-df_cdc = df_cdc[df_cdc["age"] <= x_age_max]
+df_exp = df_exp[df_exp["age"] <= 8]
 #################
 
 ## Group aggregate information by gender and race/ethnicity
 #grouped = df_aggregate.groupby([header["gender"],header["race_ethnicity"]])
 grouped = df_aggregate.groupby(["gender"])
 
-#### CDC ADD ####
-grouped_cdc = df_cdc.groupby(["gender"])
+#### EXPANSION ADD ####
+grouped_exp = df_exp.groupby(["gender"])
 #################
 
 ## Initialize dictionary to save figure handles
@@ -113,22 +112,22 @@ for name, group in grouped:
             x_name = x_attribute
             y_name = y_attribute + "_" + str(percentile)
             ax_name = 'ax_'+x_attribute+'_'+y_attribute
-            cat_label = str(percentile) + "%"
+            cat_label = str(percentile) + "% in Northshore pop."
             cat_linewidth = 2.0
             cat_color = next(color)
             
             if percentile == 85:
                 cat_linewidth = 2.0
                 if plot_bmi_only:
-                    cat_label = cat_label + ", Overweight"
+                    cat_label = cat_label# + ", Overweight"
                 cat_85_color = cat_color
             elif percentile == 95:
                 cat_linewidth = 2.0
                 if plot_bmi_only:
-                    cat_label = cat_label + ", Obese"
+                    cat_label = cat_label# + ", Obese"
                 cat_95_color = cat_color
 
-            line = group.plot(x_name, y_name, ax=fig_dict[name_gender][ax_name], color=cat_color, label=cat_label, linewidth=cat_linewidth, ls="-")            
+            line = group.plot(x_name, y_name, ax=fig_dict[name_gender][ax_name], color=cat_color, label=cat_label, linewidth=cat_linewidth, ls=":", alpha=0.8)            
 
 ### Iterate through all gender groups, plotting CDC percentiles
 for name, group in grouped:
@@ -137,16 +136,16 @@ for name, group in grouped:
 
     for x_attribute, y_attribute in attribute_pairs:
         color = config.get_color(len(percentiles))
-        for percentile in percentiles:
+        for percentile in percentiles_expansion:
             x_name = x_attribute
             y_name = y_attribute + "_" + str(percentile)
             ax_name = 'ax_'+x_attribute+'_'+y_attribute
             cat_color = next(color)
-            cat_linewidth = 2.0
+            cat_linewidth = 3.0
             cat_label = str(percentile) + "% in subset"
             
-            if display_cdc:
-                line = grouped_cdc.get_group(name_gender).plot(x_name, y_name, ax=fig_dict[name_gender][ax_name], color=cat_color, linewidth=cat_linewidth, ls="--")
+            if display_subset:
+                line = grouped_exp.get_group(name_gender).plot(x_name, y_name, ax=fig_dict[name_gender][ax_name], color=cat_color, linewidth=cat_linewidth, ls="-", label=cat_label)
             
 ## For each figure, 
 for char in fig_list:
@@ -156,7 +155,7 @@ for char in fig_list:
         fig_dict[char]['ax_age_wt'].set_ylabel("Weight (pounds)")
         fig_dict[char]['ax_age_ht'].set_xlabel("Age (years)")
         fig_dict[char]['ax_age_wt'].set_xlabel("Age (years)")
-        if not display_cdc:
+        if not display_subset:
             fig_dict[char]['ax_age_ht'].set_ylim([20, 80])
         fig_dict[char]['ax_age_ht'].set_xlim([x_age_min, x_age_max])
         fig_dict[char]['ax_age_wt'].set_xlim([x_age_min, x_age_max])
@@ -189,15 +188,21 @@ for char in fig_list:
     labels = list(labels)
     
     if not plot_bmi_only:
-        fig_dict[char]['ax_age_ht'].legend(handles, labels, loc='top left', borderaxespad=0.)
+        fig_dict[char]['ax_age_ht'].legend(handles, labels, loc='upper right', borderaxespad=0.)
     else:
-        fig_dict[char]['ax_age_bmi'].legend(handles, labels, loc='top left', borderaxespad=0.)
+        fig_dict[char]['ax_age_bmi'].legend(handles, labels, loc='upper right', borderaxespad=0.)
 
     ## Set figure title
     fig_dict[char]['fig'].patch.set_facecolor('white')
     gen_dict = dict({('M', 'Male'),('F','Female')})
-    fig_dict[char]['fig'].suptitle('Aggregate Patient Statistics, ' + gen_dict[char], fontsize=font_size)
-
+    fig_dict[char]['fig'].suptitle('Aggregate Patient Statistics, ' + gen_dict[char] + ', Subset', fontsize=font_size)
+    
+    ## EXPANSION ADD ##
+    ## Fill between
+    exp_group = grouped_exp.get_group(char)
+    fig_dict[char][ax_name].fill_between(exp_group["age"].tolist(), exp_group["bmi_5"].tolist(), exp_group["bmi_95"].tolist(), facecolor='yellow', alpha=0.2)
+    ###################
+    
     ## Set figure font sizes
     if not plot_bmi_only:
         ax_list = [fig_dict[char]['ax_age_wt'], fig_dict[char]['ax_age_ht']]
