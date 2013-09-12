@@ -25,15 +25,15 @@ There are three components to the project:
 
 ### Cleaning up the growth measurements and calculating percentiles
 
-In 'code/init_processing/', we first clean up the growth measurements by keeping individuals with enough datapoints and removing extreme outliers. We then aggregate the measurements into percentiles for each gender. We can also isolate subsets of the population that we are interested in (e.g. kids who were obese at age 5).
+In `code/init_processing/`, we first clean up the growth measurements by keeping individuals with enough datapoints and removing extreme outliers. We then aggregate the measurements into percentiles for each gender. We can also isolate subsets of the population that we are interested in (e.g. kids who were obese at age 5).
 
 ### Visualizing the growth curves
 
-In 'code/visualize', we plot the percentiles in the form of growth charts. We can also compare our growth charts to the CDC growth chart.
+In `code/visualize`, we plot the percentiles in the form of growth charts. We can also compare our growth charts to the CDC growth chart.
 
 ### Analyzing the adiposity rebound for children
 
-In 'code/adiposity_rebound', we calculate the adiposity rebound for all children whose growth curves pass the age of 5. We then run linear regressions and find that age at adiposity rebound is a satistically significant predictor of final BMI percentile.
+In `code/adiposity_rebound`, we calculate the adiposity rebound for all children whose growth curves pass the age of 5. We then run linear regressions and find that age at adiposity rebound is a satistically significant predictor of final BMI percentile.
 
 ## The data: growth measurements of children
 
