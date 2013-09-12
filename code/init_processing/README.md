@@ -1,0 +1,1 @@
+we first clean up the growth measurements by keeping individuals with enough datapoints and removing extreme outliers. We then aggregate the measurements into percentiles for each gender. We can also isolate subsets of the population that we are interested in (e.g. kids who were obese at age 5).

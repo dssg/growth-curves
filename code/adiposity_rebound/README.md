@@ -1,0 +1,1 @@
+we calculate the adiposity rebound for all children whose growth curves pass the age of 5. We then run linear regressions and find that age at adiposity rebound is a satistically significant predictor of final BMI percentile.

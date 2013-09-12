@@ -1,0 +1,1 @@
+we plot the percentiles in the form of growth charts. We can also compare our growth charts to the CDC growth chart.
