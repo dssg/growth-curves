@@ -3,7 +3,7 @@ This is a [Data Science for Social Good](http://www.dssg.io) project to analyze 
 
 ## The problem: increasing prevalence of obesity
 
-Obesity is a rapidly growing epidemic in the US. More than a third of American adults are obese, and another third are overweight. If this trend holds, over 50% of American adults will be obese by 2030, making obesity the leading public health challenge of our times.
+Obesity is a rapidly growing epidemic in the US. More than a third of American adults are obese, and another third are overweight. If this trend holds, 42% of American adults will be obese by 2030 (Finkleson et al., 2012), making obesity the leading public health challenge of our times.
 
 Excessive weight is bad for people’s health, wallet, and psyche. Obese adults are at increased risk for a long list of diseases, from heart disease to diabetes to cancer. Obesity also puts pressure on already tight healthcare budgets - on average, obese adults have medical bills that are 42% greater than those of normal weight adults (Finkelstein et al. 2009). 
 
@@ -60,6 +60,8 @@ To get in touch, email the team at dssg-northshore@googlegroups.com.
 ## References
 
 Finkelstein, E.A., Trogdon, J.G., Cohen, J.W., and Dietz., W., 2009. Annual medical spending attributable to obesity: Payer- and service-specific estimates. Health Affairs, 28(5): w822-31.
+
+Finkelstein, E.A., Khavjou, O.A., Thompson, H., Trogdon, J.G., Pan, L., Sherry, B., and Dietz, W., 2012. Obesity and severe obesity forecasts through 2030. American Journal of Preventive Medicine, 42(6): 563-570.
 
 Whitaker R.C., Pepe M.S., Wright J.A., Seidel K.D., and Dietz W.H., 1998. Early adiposity rebound and the risk of adult obesity. Pediatrics, 101(3): e5.
 
