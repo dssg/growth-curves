@@ -58,6 +58,11 @@ cd dssg-northshore-bmi/
 
 Then you will need to install the python dependencies by running `pip install -r requirements.txt`
 
+## Additional information
+
+
+The <a href="https://github.com/dssg/dssg-northshore-bmi/wiki">wiki</a> provides additional information about the problem and our solution.
+
 ## Contributing to the project
 
 To get in touch, email the team at dssg-northshore@googlegroups.com.
