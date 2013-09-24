@@ -29,7 +29,7 @@ plot_for_blog = False
 input_patient_bool = False
 
 ## Individual patient to analyze if input_patient_bool is true
-patient_id = 10258 #16785, 10258, 9026, 12322
+patient_id = 16785 #16785, 10258, 9026, 12322, 11995, 12552
 
 ## Limit number of patients plot
 count_bool = False
@@ -94,12 +94,12 @@ for name_patient, group_patient in grouped:
         if count == 20:
             break
     if input_patient_bool:
-        name_patient = patient_id    #11995 #12552
+        name_patient = patient_id    
         group_patient = grouped.get_group(name_patient)
     #print name_patient
     #print group_patient
 
-    # Throw out data less than 2 yeras
+    # Throw out data less than 2 years
     group_patient = group_patient[group_patient["age"] >= 2.0]
     
     if plot_bool and not plot_for_blog:
@@ -111,7 +111,7 @@ for name_patient, group_patient in grouped:
         ax_velo = fig.add_subplot(224) ## First derivative of log(ht), log(wt), and log(bmi)
     elif plot_for_blog:
         fig = plt.figure(1, figsize=(15, 4.75))
-        fig.subplots_adjust(bottom=0.15, left=0.025, right=0.975)
+        fig.subplots_adjust(bottom=0.15, left=0.05, right=0.975)
         ax_age_ht = fig.add_subplot(131)
         ax_age_wt = fig.add_subplot(132) 
         ax_age_bmi = fig.add_subplot(133)
@@ -224,7 +224,7 @@ for name_patient, group_patient in grouped:
         if not plot_for_blog:
             fig.suptitle("Patient #" + str(int(name_patient)) + " Progressing through Adiposity Rebound", fontsize = font_size)
         else:
-            fig.suptitle("Individual Patient with Late Adiposity Rebound", fontsize = font_size)
+            fig.suptitle("Individual Patient with Adiposity Rebound", fontsize = font_size)
 
         font = {'family' : 'normal', 'weight' : 'normal', 'size'   : font_size}
         plt.rc('font', **font)
@@ -341,9 +341,9 @@ for name_patient, group_patient in grouped:
         ar_bmi_res = np.nan
         
     else:
-        interval_index_right = np.searchsorted(config.intervals, ar_age)
+        interval_index_right = np.searchsorted(intervals, ar_age)
         
-        if ar_age in config.intervals:
+        if ar_age in intervals:
             (ar_ht_perc, ar_wt_perc, ar_bmi_perc, ar_ht_res, ar_wt_res, ar_bmi_res) = find_percentile(name_patient, ar_age, resampled_grouped_age, resampled_grouped_patient_age)
         else:
             interval_index_left = interval_index_right - 1
