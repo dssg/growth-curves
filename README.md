@@ -1,6 +1,6 @@
 # Childhood obesity prediction
 
-![NorthShore Hopsital](http://dssg.io/img/partners/northshore.jpg)
+[![NorthShore Hopsital](http://dssg.io/img/partners/northshore.jpg)](http://www.northshore.org/)
 
 Statistical models of children's growth curves that predict which kids are at risk of obesity.
 
@@ -16,7 +16,9 @@ Obesity is hard to tackle once it sinks in, so medical experts regard early prev
 
 But how can we predict which kids are at risk of becoming obese as they grow, so that we can intervene before it's too late?
 
-## The solution: mining electronic medical records
+**[To learn more about the obesity epidemic and early prevention, read the wiki.](https://github.com/dssg/dssg-northshore-bmi/wiki/problem)**
+
+## The solution: predictive modeling using electronic medical records
 
 Working with NorthShore University Healthsystem in Evanston, a Chicago suburb, we wanted to determine whether we could find patterns in a child’s growth trajectory that might indicate he or she was at risk for becoming obese later on. Nearly all children have their height and weights measured and recorded on a regular basis when they visit their pediatrician. Do early warning signals exist in this ubiquitous and routinely collected data?
 
@@ -56,6 +58,8 @@ NorthShore provided us with the height and weight measurements of over 23,000 de
 We have the patients’ gender, race, and ethnicities, along with their height, weight, and BMI measurements at different ages, from the ages of 0 to 19 yrs.
 
 Due to the sensitive nature of this medical data, we aren't able to share it publicly. If you're interested in working with us, please get in touch.
+
+**[To learn more about EMR data, read the wiki.](https://github.com/dssg/dssg-northshore-bmi/wiki/data)**
 
 ## Installation guide
 
