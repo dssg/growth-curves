@@ -1,43 +1,50 @@
-# Childhood Obesity Prediction Project
-This is a [Data Science for Social Good](http://www.dssg.io) project to analyze children's growth curves to determine which kids are at risk of obesity.
+# Childhood obesity prediction
 
-## The problem: increasing prevalence of obesity
+![NorthShore Hopsital](http://dssg.io/img/partners/northshore.jpg)
 
-Obesity is a rapidly growing epidemic in the US. More than a third of American adults are obese, and another third are overweight. If this trend holds, 42% of American adults will be obese by 2030 (Finkleson et al., 2012), making obesity the leading public health challenge of our times.
+Statistical models of children's growth curves that predict which kids are at risk of obesity.
+
+This is project is a part of the 2013 [Data Science for Social Good](http://www.dssg.io) fellowship, in partnership with [NorthShore Hospital](http://www.northshore.org/).
+
+## The problem: obesity epidemic
+
+Obesity is a rapidly growing epidemic in the US. More than a third of American adults are obese, and another third are overweight. If this trend holds, 42% of American adults will be obese by 2030 (Finkleson et al., 2012), making obesity the leading public health challenge of our time.
 
 Excessive weight is bad for people’s health, wallet, and psyche. Obese adults are at increased risk for a long list of diseases, from heart disease to diabetes to cancer. Obesity also puts pressure on already tight healthcare budgets - on average, obese adults have medical bills that are 42% greater than those of normal weight adults (Finkelstein et al. 2009). 
 
 Obesity is hard to tackle once it sinks in, so medical experts regard early prevention as the most promising method for stemming the obesity epidemic. That’s because physical exercise and good nutrition can keep children from becoming obese in the first place.
 
-## The solution: mining growth charts for predictive tools
+But how can we predict which kids are at risk of becoming obese as they grow, so that we can intervene before it's too late?
 
-![NorthShore Hopsital](http://dssg.io/img/partners/northshore.jpg)
+## The solution: mining electronic medical records
 
-Working with NorthShore University Healthsystem in Evanston, a Chicago suburb, we wanted to determine whether we could find patterns in a child’s growth trajectory that might indicate he or she was at risk for becoming obese later on. Nearly all children have their height and weights measured and recorded on a regular basis when they visit their pediatrician. Do early warning signals exist in this data that has already been captured?
+Working with NorthShore University Healthsystem in Evanston, a Chicago suburb, we wanted to determine whether we could find patterns in a child’s growth trajectory that might indicate he or she was at risk for becoming obese later on. Nearly all children have their height and weights measured and recorded on a regular basis when they visit their pediatrician. Do early warning signals exist in this ubiquitous and routinely collected data?
 
-To discover these patterns, we obtained from NorthShore’s electronic medical records de-identified height, weight, and body mass index (BMI) measurements of kids as they grow up. BMI is a way to keep track of body fat, calculated from the person’s weight (in kilograms) divided by the person’s height (in meters) squared. 
+To discover these patterns, we obtained anonimized electronic medical records from NorthShore on the height, weight, and body mass index (BMI) measurements of young patients over the years. (BMI is a way to keep track of body fat, calculated from the person’s weight (in kilograms) divided by the person’s height (in meters) squared.)
 
-In this data, we wanted to find if these children underwent a physical phenomenon called **adiposity rebound**, when children’s BMIs undergo a dip and then a rebound around age 5 to 6 (Whitaker et al., 1998; Williams and Goulding, 2009). Authors of these papers had conducted studies on a small scale showing that early adiposity rebound was associated with increased risk of adult obesity. We wanted to know if this phenomenon was present for the general population and detectable in routinely collected electronic medical records. We have posted our preliminary results in the wiki.
+We wanted to detect if any of these children experienced a physical phenomenon called **adiposity rebound**, when a child's BMI dips and rebounds between age 5 to 6 (Whitaker et al., 1998; Williams and Goulding, 2009). Small-scale studies have suggested that early adiposity rebound is associated with increased risk of adult obesity. So we wanted to know if this phenomenon was present in the NortShore's patient population, and detectable in routinely collected electronic medical records. 
 
-## The project
+**[For more on our methodology, read the wiki.](https://github.com/dssg/dssg-northshore-bmi/wiki/methodology)**
+
+## Project layout
 
 There are three components to the project:
 
 ### Cleaning up the growth measurements and calculating percentiles
 
-In `code/init_processing/`, we first clean up the growth measurements by keeping individuals with enough datapoints and removing extreme outliers. We then aggregate the measurements into percentiles for each gender. We can also isolate subsets of the population that we are interested in (e.g. kids who were obese at age 5).
+In `code/init_processing/`, we first clean up NortShore's EMR growth measurements by keeping individuals with enough datapoints and removing extreme outliers. We then aggregate the measurements into percentiles for each gender. We also isolate subsets of the population that we are interested in (e.g. kids who were obese at age 5).
 
 ### Visualizing the growth curves
 
-In `code/visualize`, we plot the percentiles in the form of growth charts. We can also compare our growth charts to the CDC growth chart.
+In `code/visualize`, we plot the percentiles in the form of growth charts. We can also compare our growth charts to growth charts from the Center for Disease Control (CDC).
 
 ### Analyzing the adiposity rebound for children
 
-In `code/adiposity_rebound`, we calculate the adiposity rebound for all children whose growth curves pass the age of 5. We then run linear regressions and find that age at adiposity rebound is a satistically significant predictor of final BMI percentile.
+In `code/adiposity_rebound`, we attempt to detect adiposity rebound in all NortShore patients whose growth curves extend past the age of 5 (due to available EMR data). We then run linear regressions and find that age at adiposity rebound is a statistically significant predictor of a child's final BMI percentile, and thus of their obesity risk.
 
 ## The data: growth measurements of children
 
-NorthShore provided us with the height and weight measurements of over 23,000 children de-identified records captured over the past 6 years by NorthShore hospitals’ EMR system. A sample of the data we received is shown below. We have the patients’ gender, race, and ethnicities, along with their height, weight, and BMI measurements at different ages, from the ages of 0 to 19 yrs.
+NorthShore provided us with the height and weight measurements of over 23,000 de-identified children. NorthShore's EMR systems captured these records over the past 6 years. The data looks like this: 
 
 |id | gender | race_ethnicity | age | bmi | ht | wt |
 |------:|:-----:|:-------:|:-----:|:-----:|:---:|:---|
@@ -46,9 +53,11 @@ NorthShore provided us with the height and weight measurements of over 23,000 ch
 |2	|M	|African American	|4.04	|17.9	|42.5	|46|
 |2	|M	|African American	|5.05	|17.58	|45.6	|52|
 
-Unfortunately, we do not have the permissions to share this medical data publicly. If you are interested in accessing the data, please email us at the email below.
+We have the patients’ gender, race, and ethnicities, along with their height, weight, and BMI measurements at different ages, from the ages of 0 to 19 yrs.
 
-## Installation 
+Due to the sensitive nature of this medical data, we aren't able to share it publicly. If you're interested in working with us, please get in touch.
+
+## Installation guide
 
 First you will need to clone the repo. 
 ````
@@ -56,12 +65,8 @@ git clone https://github.com/dssg/dssg-northshore-bmi
 cd dssg-northshore-bmi/
 ````
 
-Then you will need to install the python dependencies by running `pip install -r requirements.txt`
-
-## Additional information
-
-
-The <a href="https://github.com/dssg/dssg-northshore-bmi/wiki">wiki</a> provides additional information about the problem and our solution.
+Then you will need to install the python dependencies by running 
+`pip install -r requirements.txt`
 
 ## Contributing to the project
 
