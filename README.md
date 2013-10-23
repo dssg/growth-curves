@@ -16,7 +16,7 @@ Obesity is hard to tackle once it sinks in, so medical experts regard early prev
 
 But how can we predict which kids are at risk of becoming obese as they grow, so that we can intervene before it's too late?
 
-**[To learn more about the obesity epidemic and early prevention, read the wiki.](https://github.com/dssg/dssg-northshore-bmi/wiki/problem)**
+**[To learn more about the obesity epidemic and early prevention, read the wiki.](https://github.com/dssg/growth-curves/wiki/problem)**
 
 ## The solution: predictive modeling using electronic medical records
 
@@ -26,11 +26,11 @@ To discover these patterns, we obtained anonimized electronic medical records fr
 
 We wanted to detect if any of these children experienced a physical phenomenon called **adiposity rebound**, when a child's BMI dips and rebounds between age 5 to 6 (Whitaker et al., 1998; Williams and Goulding, 2009). Small-scale studies have suggested that early adiposity rebound is associated with increased risk of adult obesity. So we wanted to know if this phenomenon was present in the NortShore's patient population, and detectable in routinely collected electronic medical records. 
 
-**[For more on our methodology, read the wiki.](https://github.com/dssg/dssg-northshore-bmi/wiki/methodology)**
+**[For more on our methodology, read the wiki.](https://github.com/dssg/growth-curves/wiki/methodology)**
 
 ## Project layout
 
-There are three components to the project:
+There are three components to the project in `code`:
 
 ### Cleaning up the growth measurements and calculating percentiles
 
@@ -59,18 +59,28 @@ We have the patients’ gender, race, and ethnicities, along with their height, 
 
 Due to the sensitive nature of this medical data, we aren't able to share it publicly. If you're interested in working with us, please get in touch.
 
-**[To learn more about EMR data, read the wiki.](https://github.com/dssg/dssg-northshore-bmi/wiki/data)**
+**[To learn more about EMR data, read the wiki.](https://github.com/dssg/growth-curves/wiki/data)**
+
+However, we are able to provide the height, weight, and BMI data the U.S. Center for Disease Control and Prevention (CDC) uses for their growth charts. This reference data can be found at `data/csv/CDC_data.csv`
+
+## Additional folders
+
+`figures/for_wiki/` contains figures for the [wiki](https://github.com/dssg/growth-curves/wiki/) on our project. 
 
 ## Installation guide
 
 First you will need to clone the repo. 
 ````
-git clone https://github.com/dssg/dssg-northshore-bmi
-cd dssg-northshore-bmi/
+git clone https://github.com/dssg/growth-curves
+cd growth-curves/
 ````
 
 Then you will need to install the python dependencies by running 
 `pip install -r requirements.txt`
+
+## Team
+
+<img src="https://github.com/dssg/dssg-northshore-bmi/blob/master/figures/for_wiki/northshore_team.png?raw=true" align="center">
 
 ## Contributing to the project
 
