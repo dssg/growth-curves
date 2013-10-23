@@ -30,7 +30,7 @@ We wanted to detect if any of these children experienced a physical phenomenon c
 
 ## Project layout
 
-There are three components to the project in `code`:
+There are three components to the project. Python code for this work can be found in `code`.
 
 ### Cleaning up the growth measurements and calculating percentiles
 
